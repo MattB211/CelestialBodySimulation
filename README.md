@@ -1,1 +1,1 @@
-# ThreeBody
+# Celestial Body Simulation
