@@ -1,6 +1,6 @@
 import scipy as sci
 import numpy
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plot
 from matplotlib import animation
 import scipy.integrate
 
@@ -67,10 +67,16 @@ def ThreeBodyEquations(w, t, G, m1, m2, m3):
     return derivs
 
 # *** Create Plots/Animations ***
-def ThreeBodyStart(move):
+def ThreeBodyStart(sim, save):
     init_params = numpy.array([r1, r2, r3, v1, v2, v3])  # Initial parameters
     init_params = init_params.flatten()  # Flatten to make 1D array
-    time_span = numpy.linspace(0, 10, 500)  # 20 orbital periods and 500 points
+
+    # Modify time span and number of points to change graph output
+    # Orbitals = Length of Run
+    orbitals = 10
+    # Points = Amount of Data -> Graph Smoothness
+    points = 1000
+    time_span = numpy.linspace(0, orbitals, points)  # 10 orbital periods and 500 points
 
     three_body_sol = sci.integrate.odeint(ThreeBodyEquations, init_params, time_span, args=(G, m1, m2, m3))
     r1_sol = three_body_sol[:, :3]
@@ -78,59 +84,62 @@ def ThreeBodyStart(move):
     r3_sol = three_body_sol[:, 6:9]
     r_com_sol = (m1 * r1_sol[:] + m2 * r2_sol[:] + m3 * r3_sol[:]) / (m1 + m2 + m3)
 
-    fig = plt.figure(figsize=(10, 10), dpi=100)
+    fig = plot.figure(figsize=(10, 10), dpi=100)
     # Create 3D axes
-    ax = fig.add_subplot(111, projection="3d")
+    model = fig.add_subplot(111, projection="3d")
 
-    if not move:
-        # Plot the orbits
-        ax.plot(r1_sol[:, 0], r1_sol[:, 1], r1_sol[:, 2], color="darkblue")
-        ax.plot(r2_sol[:, 0], r2_sol[:, 1], r2_sol[:, 2], color="tab:red")
-        ax.plot(r3_sol[:, 0], r3_sol[:, 1], r3_sol[:, 2], color="green")
-        # Plot Center of mass
-        ax.plot(r_com_sol[:, 0], r_com_sol[:, 1], r_com_sol[:, 2], color="purple")
-
-        # Plot the final positions of the stars
-        ax.scatter(r1_sol[-1, 0], r1_sol[-1, 1], r1_sol[-1, 2], color="darkblue", marker="o", s=100,
-                   label="Alpha Centauri A")
-        ax.scatter(r2_sol[-1, 0], r2_sol[-1, 1], r2_sol[-1, 2], color="tab:red", marker="o", s=100,
-                   label="Alpha Centauri B")
-        ax.scatter(r3_sol[-1, 0], r3_sol[-1, 1], r3_sol[-1, 2], color="green", marker="o", s=100,
-                   label="Alpha Centauri C")
-        # Plot final center of mass
-        ax.scatter(r_com_sol[-1, 0], r_com_sol[-1, 1], r_com_sol[-1, 2], color="purple", marker="o", s=100)
-
-        # Add a few more bells and whistles
-        ax.set_xlabel("x-coordinate", fontsize=14)
-        ax.set_ylabel("y-coordinate", fontsize=14)
-        ax.set_zlabel("z-coordinate", fontsize=14)
-        ax.set_title("Visualization of a three-body system\n", fontsize=14)
-        ax.legend(loc="upper left", fontsize=14)
-    else:
+    if sim:
         def animate(f):
             # Animate the plots the orbits
-            ax.cla()
-            ax.scatter(r1_sol[f, 0], r1_sol[f, 1], r1_sol[f, 2], color="darkblue")
-            ax.scatter(r2_sol[f, 0], r2_sol[f, 1], r2_sol[f, 2], color="tab:red")
-            ax.scatter(r3_sol[f, 0], r3_sol[f, 1], r3_sol[f, 2], color="green")
-            ax.scatter(r_com_sol[f, 0], r_com_sol[f, 1], r_com_sol[f, 2], color="purple")
+            model.cla()
+            model.scatter(r1_sol[f, 0], r1_sol[f, 1], r1_sol[f, 2], color="blue")
+            model.scatter(r2_sol[f, 0], r2_sol[f, 1], r2_sol[f, 2], color="red")
+            model.scatter(r3_sol[f, 0], r3_sol[f, 1], r3_sol[f, 2], color="green")
+            model.scatter(r_com_sol[f, 0], r_com_sol[f, 1], r_com_sol[f, 2], color="purple")
 
             # Draw the lines of the orbit
-            ax.plot(r1_sol[:f, 0], r1_sol[:f, 1], r1_sol[:f, 2], color="darkblue")
-            ax.plot(r2_sol[:f, 0], r2_sol[:f, 1], r2_sol[:f, 2], color="tab:red")
-            ax.plot(r3_sol[:f, 0], r3_sol[:f, 1], r3_sol[:f, 2], color="green")
-            ax.plot(r_com_sol[:f, 0], r_com_sol[:f, 1], r_com_sol[:f, 2], color="purple")
-        ani = animation.FuncAnimation(fig, animate, frames=500, interval=50)
+            model.plot(r1_sol[:f, 0], r1_sol[:f, 1], r1_sol[:f, 2], color="blue")
+            model.plot(r2_sol[:f, 0], r2_sol[:f, 1], r2_sol[:f, 2], color="red")
+            model.plot(r3_sol[:f, 0], r3_sol[:f, 1], r3_sol[:f, 2], color="green")
+            model.plot(r_com_sol[:f, 0], r_com_sol[:f, 1], r_com_sol[:f, 2], color="purple")
+
+        # Label our Plot
+        model.set_xlabel("X-Axis", fontsize=14)
+        model.set_ylabel("Y-Axis", fontsize=14)
+        model.set_zlabel("Z-Axis", fontsize=14)
+        model.set_title("Visualization of a Three-Body System\n", fontsize=14)
+        model.legend(loc="upper left", fontsize=14)
+
+        # Interval makes the graph smoother and run faster / slower
+        # Does not have to be orbitals, it is there to improve smoothness consistency
+        # Frames should not exceed points or else out-of-bounds error
+        ani = animation.FuncAnimation(fig, animate, frames=points, interval=orbitals)
 
         # Save a gif of the animation
-        if False: # Disabled for now (will create huge files)
+        # WARNING: FILE SIZE CAN BECOME LARGE
+        if save:
             writer = animation.PillowWriter(fps=10)
             print("Saving Gif")
             ani.save(filename="ThreeBodyTest.gif", writer=writer)
             print("Finished!")
 
+    else:
+        # Plot the orbits
+        model.plot(r1_sol[:, 0], r1_sol[:, 1], r1_sol[:, 2], color="darkblue")
+        model.plot(r2_sol[:, 0], r2_sol[:, 1], r2_sol[:, 2], color="red")
+        model.plot(r3_sol[:, 0], r3_sol[:, 1], r3_sol[:, 2], color="green")
+        # Plot Center of mass
+        model.plot(r_com_sol[:, 0], r_com_sol[:, 1], r_com_sol[:, 2], color="purple")
+
+        # Plot the final positions of the stars
+        model.scatter(r1_sol[-1, 0], r1_sol[-1, 1], r1_sol[-1, 2], color="blue", marker="o", s=100,label="Star A")
+        model.scatter(r2_sol[-1, 0], r2_sol[-1, 1], r2_sol[-1, 2], color="red", marker="o", s=100,label="Star B")
+        model.scatter(r3_sol[-1, 0], r3_sol[-1, 1], r3_sol[-1, 2], color="green", marker="o", s=100,label="Star C")
+        # Plot final center of mass
+        model.scatter(r_com_sol[-1, 0], r_com_sol[-1, 1], r_com_sol[-1, 2], color="purple", marker="o", s=100)
+
     # Show the Image/Animation
-    plt.show()
+    plot.show()
 
 
 # Interesting Starts

@@ -1,6 +1,6 @@
 import scipy as sci
 import numpy
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plot
 import scipy.integrate
 
 # Define universal gravitation constant
@@ -60,21 +60,21 @@ def TwoBodyStart():
     r1_sol = two_body_sol[:, :3]
     r2_sol = two_body_sol[:, 3:6]
     # Create figure
-    fig = plt.figure(figsize=(15, 15))
+    fig = plot.figure(figsize=(15, 15))
     # Create 3D axes
-    ax = fig.add_subplot(111, projection="3d")
+    model = fig.add_subplot(111, projection="3d")
     # Plot the orbits
-    ax.plot(r1_sol[:, 0], r1_sol[:, 1], r1_sol[:, 2], color="darkblue")
-    ax.plot(r2_sol[:, 0], r2_sol[:, 1], r2_sol[:, 2], color="tab:red")
+    model.plot(r1_sol[:, 0], r1_sol[:, 1], r1_sol[:, 2], color="darkblue")
+    model.plot(r2_sol[:, 0], r2_sol[:, 1], r2_sol[:, 2], color="tab:red")
     # Plot the final positions of the stars
-    ax.scatter(r1_sol[-1, 0], r1_sol[-1, 1], r1_sol[-1, 2], color="darkblue", marker="o", s=100,
+    model.scatter(r1_sol[-1, 0], r1_sol[-1, 1], r1_sol[-1, 2], color="darkblue", marker="o", s=100,
                label="Alpha Centauri A")
-    ax.scatter(r2_sol[-1, 0], r2_sol[-1, 1], r2_sol[-1, 2], color="tab:red", marker="o", s=100,
+    model.scatter(r2_sol[-1, 0], r2_sol[-1, 1], r2_sol[-1, 2], color="tab:red", marker="o", s=100,
                label="Alpha Centauri B")
     # Add a few more bells and whistles
-    ax.set_xlabel("x-coordinate", fontsize=14)
-    ax.set_ylabel("y-coordinate", fontsize=14)
-    ax.set_zlabel("z-coordinate", fontsize=14)
-    ax.set_title("Visualization of orbits of stars in a two-body system\n", fontsize=14)
-    ax.legend(loc="upper left", fontsize=14)
-    plt.show()
+    model.set_xlabel("x-coordinate", fontsize=14)
+    model.set_ylabel("y-coordinate", fontsize=14)
+    model.set_zlabel("z-coordinate", fontsize=14)
+    model.set_title("Visualization of orbits of stars in a two-body system\n", fontsize=14)
+    model.legend(loc="upper left", fontsize=14)
+    plot.show()
