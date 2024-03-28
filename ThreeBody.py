@@ -42,7 +42,7 @@ v3 = numpy.array(v3, dtype="float64")
 v_com = (m1 * v1 + m2 * v2 + m3 * v3) / (m1 + m2 + m3)
 
 # *** Derivative Equations ***
-def ThreeBodyEquations(w, t, G, m1, m2, m3):
+def ThreeBodyEquations(w, t, m1, m2, m3):
     r1 = w[:3]
     r2 = w[3:6]
     r3 = w[6:9]
@@ -78,7 +78,7 @@ def ThreeBodyStart(sim, save):
     points = 1000
     time_span = numpy.linspace(0, orbitals, points)  # 10 orbital periods and 500 points
 
-    three_body_sol = sci.integrate.odeint(ThreeBodyEquations, init_params, time_span, args=(G, m1, m2, m3))
+    three_body_sol = sci.integrate.odeint(ThreeBodyEquations, init_params, time_span, args=(m1, m2, m3))
     r1_sol = three_body_sol[:, :3]
     r2_sol = three_body_sol[:, 3:6]
     r3_sol = three_body_sol[:, 6:9]
